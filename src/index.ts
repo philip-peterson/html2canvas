@@ -26,7 +26,9 @@ if (typeof window !== 'undefined') {
     CacheStorage.setContext(window);
 }
 
-const renderElement = async (element: HTMLElement, opts: Partial<Options>): Promise<HTMLCanvasElement> => {
+type WinConfig = Pick<Window, 'innerWidth' | 'innerHeight' | 'pageXOffset' | 'pageYOffset' | 'devicePixelRatio'>
+
+const renderElement = async (element: HTMLElement, opts: Partial<Options>, windowConfig?: WinConfig): Promise<HTMLCanvasElement> => {
     if (!element || typeof element !== 'object') {
         return Promise.reject('Invalid element provided as first argument');
     }
@@ -36,10 +38,10 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         throw new Error(`Element is not attached to a Document`);
     }
 
-    const defaultView = ownerDocument.defaultView;
+    const defaultView = ownerDocument.defaultView ?? windowConfig;
 
     if (!defaultView) {
-        throw new Error(`Document is not attached to a Window`);
+        throw new Error(`Document is not attached to a Window and no windowConfig is set`);
     }
 
     const resourceOptions = {
